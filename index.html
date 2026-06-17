@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<meta name="description" content="Getin Lab builds MURMUR — the shared intelligence that turns a fleet of small robots into one team watching your site. Holds formation without GPS, keeps working when the network drops.">
+<title>Getin Lab — MURMUR · autonomous site security</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=Archivo:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#e7e5df;          /* page ground (stone) */
+    --ink-deep:#1b1a16;     /* inverted plate / charcoal */
+    --paper:#1b1a16;        /* text on stone */
+    --paper-bright:#000000;
+    --muted:#56544b;
+    --faint:#8c897e;
+    --accent:#9d6450;       /* muted clay */
+    --accent-soft:#7c4d3b;
+    --rule:rgba(27,26,22,0.30);
+    --rule-strong:rgba(27,26,22,0.82);
+    --grid:rgba(27,26,22,0.11);
+    --display:'Archivo',system-ui,-apple-system,sans-serif;
+    --body:'Newsreader',Georgia,serif;
+    --label:'Archivo',system-ui,sans-serif;
+
+    --type-display:clamp(54px,15vw,168px);
+    --type-title:clamp(30px,5.4vw,64px);
+    --type-statement:clamp(25px,4.3vw,50px);
+    --type-subtitle:clamp(21px,3vw,34px);
+    --type-lead:clamp(17px,2.2vw,26px);
+    --type-body:clamp(16px,1.5vw,19px);
+    --type-caption:clamp(12px,1.3vw,14px);
+    --type-kicker:clamp(12px,1.3vw,14px);
+
+    --pad-x:clamp(20px,6vw,118px);
+    --maxw:1180px;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:var(--ink);color:var(--paper);
+    font-family:var(--body);font-size:var(--type-body);line-height:1.55;
+    -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;overflow-x:hidden;}
+  a{color:inherit;}
+  p{margin:0;}
+  em{font-style:italic;color:var(--paper-bright);}
+  strong{font-weight:600;color:var(--paper-bright);}
+  .mut{color:var(--muted);}
+  img{max-width:100%;display:block;}
+
+  /* ---- masthead / nav ---- */
+  header.mast{position:sticky;top:0;z-index:60;
+    background:rgba(231,229,223,0.86);backdrop-filter:saturate(140%) blur(9px);
+    border-bottom:2px solid var(--rule-strong);}
+  .mast-in{max-width:var(--maxw);margin:0 auto;padding:14px var(--pad-x);
+    display:flex;align-items:center;justify-content:space-between;gap:1em;}
+  .wm{font-family:var(--label);font-weight:700;font-size:15px;
+    letter-spacing:.26em;text-transform:uppercase;color:var(--paper);
+    display:flex;align-items:center;gap:.7em;white-space:nowrap;text-decoration:none;}
+  .wm .sq{width:.62em;height:.62em;background:var(--accent);display:inline-block;}
+  .sig{display:inline-flex;align-items:flex-end;gap:2.5px;height:14px;}
+  .sig i{width:3px;display:block;background:var(--faint);}
+  .sig i:nth-child(1){height:5px;}
+  .sig i:nth-child(2){height:9px;}
+  .sig i:nth-child(3){height:14px;background:var(--accent);}
+  nav.links{display:flex;gap:1.7em;font-family:var(--label);
+    font-size:13px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);font-weight:600;}
+  nav.links a{text-decoration:none;transition:color .2s;}
+  nav.links a:hover{color:var(--accent);}
+  .mast-right{display:flex;align-items:center;gap:1.2em;}
+  .nav-cta{font-family:var(--label);font-size:13px;letter-spacing:.16em;text-transform:uppercase;
+    font-weight:700;color:var(--paper);border:1.5px solid var(--rule-strong);
+    padding:.6em 1.1em;text-decoration:none;white-space:nowrap;transition:.2s;}
+  .nav-cta:hover{background:var(--accent);border-color:var(--accent);color:#fff;}
+
+  /* hamburger */
+  .burger{display:none;width:44px;height:44px;border:1.5px solid var(--rule-strong);background:transparent;
+    cursor:pointer;padding:0;align-items:center;justify-content:center;flex-direction:column;gap:5px;}
+  .burger span{display:block;width:20px;height:2px;background:var(--paper);transition:.25s;}
+  .burger[aria-expanded="true"] span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+  .burger[aria-expanded="true"] span:nth-child(2){opacity:0;}
+  .burger[aria-expanded="true"] span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+
+  /* mobile drawer */
+  .drawer{position:fixed;inset:0;z-index:55;background:var(--ink-deep);
+    display:flex;flex-direction:column;justify-content:center;gap:6px;padding:0 var(--pad-x);
+    transform:translateY(-100%);transition:transform .4s cubic-bezier(.2,.7,.2,1);
+    background-image:linear-gradient(rgba(231,228,220,0.10) 1px,transparent 1px),linear-gradient(90deg,rgba(231,228,220,0.10) 1px,transparent 1px);
+    background-size:48px 48px;}
+  .drawer.open{transform:none;}
+  .drawer a{font-family:var(--display);font-weight:700;font-size:clamp(30px,9vw,52px);
+    color:#e7e4dc;text-decoration:none;letter-spacing:-.02em;padding:.18em 0;
+    border-bottom:1px solid rgba(231,228,220,0.16);}
+  .drawer a:last-child{border-bottom:none;color:var(--accent);margin-top:.4em;}
+  .drawer a .n{font-family:var(--label);font-size:13px;font-weight:700;color:var(--accent);
+    letter-spacing:.1em;margin-right:.8em;vertical-align:middle;}
+
+  @media(max-width:880px){
+    nav.links,.mast-right .nav-cta{display:none;}
+    .burger{display:flex;}
+  }
+
+  /* ---- section frame ---- */
+  section{padding:clamp(58px,9vh,118px) 0;border-top:1px solid var(--rule);position:relative;}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 var(--pad-x);}
+  section.plate{background-color:var(--ink-deep);color:#e7e4dc;
+    background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+    background-size:58px 58px;border-top:none;
+    --paper:#e7e4dc;--paper-bright:#ffffff;--muted:#aaa498;--faint:#79766c;
+    --rule:rgba(231,228,220,0.20);--rule-strong:rgba(231,228,220,0.55);--grid:rgba(231,228,220,0.13);}
+
+  /* ---- editorial primitives ---- */
+  .kicker{font-family:var(--label);font-size:var(--type-kicker);font-weight:700;
+    letter-spacing:.3em;text-transform:uppercase;color:var(--accent);
+    margin-bottom:1.6em;display:flex;align-items:center;gap:.9em;}
+  .kicker::before{content:"";width:46px;height:3px;background:var(--accent);display:inline-block;flex:none;}
+  .headline{font-family:var(--display);font-weight:900;font-size:var(--type-title);
+    line-height:1.02;letter-spacing:-.025em;color:var(--paper-bright);max-width:20ch;text-wrap:balance;margin:0;}
+  .headline em{font-style:italic;color:var(--accent);}
+  .statement{font-family:var(--display);font-weight:800;font-size:var(--type-statement);
+    line-height:1.12;letter-spacing:-.02em;color:var(--paper-bright);max-width:22ch;text-wrap:balance;margin:0;}
+  .statement em{font-style:italic;color:var(--accent);}
+  .lead{font-size:var(--type-lead);line-height:1.55;color:var(--muted);max-width:54ch;font-weight:400;}
+  .lead strong{font-weight:700;color:var(--paper-bright);}
+  .lead.drop::first-letter{font-family:var(--display);font-weight:600;font-size:3.3em;line-height:.72;
+    float:left;color:var(--accent);padding:.06em .12em 0 0;}
+  .mt{margin-top:34px;}
+  .mt-s{margin-top:20px;}
+
+  /* columns */
+  .cols{display:grid;gap:0;}
+  .cols.two{grid-template-columns:1fr 1fr;}
+  .cols.two-l{grid-template-columns:1.05fr .95fr;align-items:center;}
+  .cols.three{grid-template-columns:repeat(3,1fr);}
+  .col{padding:0 clamp(20px,3vw,46px);border-left:1px solid var(--rule);}
+  .col:first-child{padding-left:0;border-left:none;}
+  .col h3{font-family:var(--display);font-weight:800;font-size:clamp(22px,2.6vw,32px);line-height:1.12;
+    margin:0 0 .5em;color:var(--paper-bright);letter-spacing:-.01em;}
+  .col p{font-size:var(--type-body);line-height:1.5;color:var(--muted);}
+  .col .tag{font-family:var(--label);font-size:var(--type-caption);letter-spacing:.2em;
+    text-transform:uppercase;color:var(--accent);display:block;margin-bottom:.8em;font-weight:600;}
+  @media(max-width:760px){
+    .cols.two,.cols.two-l,.cols.three{grid-template-columns:1fr;gap:34px;}
+    .col{padding:0;border-left:none;border-top:1px solid var(--rule);padding-top:30px;}
+    .col:first-child{border-top:none;padding-top:0;}
+  }
+
+  /* numbered editorial list */
+  ul.ed{list-style:none;margin:0;padding:0;}
+  ul.ed li{font-size:var(--type-body);line-height:1.5;color:var(--muted);
+    padding:18px 0;border-top:1px solid var(--rule);display:flex;gap:.9em;}
+  ul.ed li:first-child{border-top:none;}
+  ul.ed li strong{color:var(--paper-bright);font-weight:700;}
+  ul.ed li .n{font-family:var(--label);font-weight:700;color:var(--accent);
+    font-size:.82em;letter-spacing:.06em;flex:none;width:1.6em;padding-top:.28em;}
+
+  /* big figures */
+  .figrow{display:grid;grid-template-columns:repeat(4,1fr);gap:0;}
+  .fg{padding:0 clamp(16px,2.4vw,40px);border-left:1px solid var(--rule);}
+  .fg:first-child{padding-left:0;border-left:none;}
+  .fg .num{font-family:var(--display);font-weight:500;font-size:clamp(42px,6vw,82px);line-height:.92;color:var(--paper-bright);}
+  .fg .num .u{font-size:.4em;color:var(--accent);font-style:italic;}
+  .fg .lbl{font-size:var(--type-body);color:var(--muted);margin-top:.6em;line-height:1.42;max-width:20ch;}
+  @media(max-width:620px){ .figrow{grid-template-columns:1fr 1fr;gap:30px 0;} .fg{padding:0 clamp(14px,4vw,26px);} .fg:nth-child(odd){padding-left:0;border-left:none;} }
+
+  /* chips */
+  .chips{display:flex;flex-wrap:wrap;gap:12px;}
+  .chip{font-family:var(--label);font-size:var(--type-caption);letter-spacing:.08em;
+    color:var(--paper);border:1px solid var(--rule-strong);padding:.55em 1em;flex:none;white-space:nowrap;
+    display:inline-flex;align-items:center;gap:.6em;text-transform:uppercase;font-weight:500;}
+  .chip .d{width:.6em;height:.6em;border-radius:50%;background:var(--accent);flex:none;}
+
+  /* figure container */
+  .fig{display:flex;align-items:center;justify-content:center;}
+  .fig svg{max-width:100%;height:auto;}
+  .fig-frame{position:relative;padding:clamp(16px,3vw,34px);background:#1b1a16;border:1px solid var(--rule-strong);}
+  .fig-frame::before,.fig-frame::after{content:"";position:absolute;width:18px;height:18px;border:1.5px solid var(--accent);z-index:2;}
+  .fig-frame::before{top:9px;left:9px;border-right:0;border-bottom:0;}
+  .fig-frame::after{bottom:9px;right:9px;border-left:0;border-top:0;}
+  .cap{font-family:var(--label);font-size:var(--type-caption);letter-spacing:.2em;
+    text-transform:uppercase;color:var(--muted);margin-top:1em;}
+  .cap b{color:var(--accent);font-weight:600;}
+
+  /* pull quote */
+  .pull{font-family:var(--display);font-weight:500;font-size:clamp(27px,4.4vw,52px);
+    line-height:1.18;color:var(--paper-bright);max-width:22ch;letter-spacing:-.01em;margin:0;}
+  .pull .mark{color:var(--accent);}
+  .pull .by{display:block;font-family:var(--label);font-size:var(--type-caption);
+    letter-spacing:.22em;text-transform:uppercase;color:var(--muted);margin-top:1.1em;font-weight:500;}
+
+  /* buttons */
+  .btn{font-family:var(--label);font-size:14px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;
+    color:#fff;background:var(--accent);border:1.5px solid var(--accent);padding:.95em 1.7em;
+    text-decoration:none;display:inline-block;transition:.2s;}
+  .btn:hover{background:var(--accent-soft);border-color:var(--accent-soft);}
+  .btn.ghost{background:transparent;color:var(--paper);border-color:var(--rule-strong);}
+  .btn.ghost:hover{background:var(--accent);border-color:var(--accent);color:#fff;}
+
+  /* ---- HERO (full-bleed murmuration) ---- */
+  .hero{position:relative;min-height:100svh;display:flex;flex-direction:column;
+    color:#f0eee8;overflow:hidden;border-top:none;padding:0;}
+  .hero .photo{position:absolute;inset:0;background:#1b1a16;}
+  .hero .photo img{width:100%;height:100%;object-fit:cover;object-position:60% 30%;
+    filter:grayscale(0.25) contrast(1.05);}
+  .hero .scrim{position:absolute;inset:0;z-index:1;
+    background:
+      linear-gradient(180deg,rgba(20,19,16,0.62) 0%,rgba(20,19,16,0.16) 26%,rgba(20,19,16,0.12) 52%,rgba(20,19,16,0.74) 100%),
+      linear-gradient(90deg,rgba(20,19,16,0.82) 0%,rgba(20,19,16,0.60) 38%,rgba(20,19,16,0.34) 62%,rgba(20,19,16,0.10) 88%);}
+  .hero .grid-ov{position:absolute;inset:0;z-index:2;pointer-events:none;
+    background-image:linear-gradient(rgba(231,228,220,0.07) 1px,transparent 1px),linear-gradient(90deg,rgba(231,228,220,0.07) 1px,transparent 1px);
+    background-size:58px 58px;}
+  .hero .hud{position:absolute;inset:0;z-index:3;pointer-events:none;}
+  .hero-in{position:relative;z-index:4;width:100%;max-width:var(--maxw);margin:0 auto;
+    padding:0 var(--pad-x);display:flex;flex-direction:column;justify-content:space-between;flex:1;min-height:100svh;}
+  .hero-top{display:flex;justify-content:space-between;align-items:baseline;gap:1em;flex-wrap:wrap;
+    font-family:var(--label);font-size:var(--type-caption);letter-spacing:.24em;text-transform:uppercase;
+    color:rgba(240,238,232,0.78);padding:calc(clamp(58px,9vh,118px) * 0.55) 0 16px;border-bottom:1px solid rgba(240,238,232,0.22);}
+  .hero-top .ed{color:#fff;font-weight:600;}
+  .hero-center{padding:clamp(34px,6vh,68px) 0;}
+  .wordmark{font-family:var(--display);font-weight:900;font-size:var(--type-display);
+    line-height:.82;letter-spacing:-.035em;color:#fff;text-shadow:0 2px 40px rgba(0,0,0,0.35);}
+  .wordmark .lab{color:var(--accent);}
+  .product{font-family:var(--display);font-weight:600;font-size:clamp(20px,3.3vw,38px);
+    line-height:1.16;letter-spacing:-.01em;color:#fff;margin-top:.5em;max-width:24ch;text-wrap:balance;text-shadow:0 2px 24px rgba(15,14,11,0.55);}
+  .product .mur{color:var(--accent);}
+  .hero .sub-copy{font-size:var(--type-lead);color:rgba(243,241,236,0.94);max-width:52ch;
+    line-height:1.55;margin-top:24px;font-weight:400;text-shadow:0 1px 18px rgba(15,14,11,0.7),0 0 3px rgba(15,14,11,0.5);}
+  .hero .sub-copy em{color:#fff;font-style:italic;}
+  .hero .sub-copy strong{color:#fff;font-weight:600;}
+  .hero-cta{display:flex;gap:14px;margin-top:30px;flex-wrap:wrap;}
+  .hero-bottom{display:flex;justify-content:space-between;align-items:baseline;gap:1em;flex-wrap:wrap;
+    font-family:var(--label);font-size:var(--type-caption);letter-spacing:.22em;text-transform:uppercase;
+    color:rgba(240,238,232,0.72);padding:18px 0 calc(clamp(58px,9vh,118px) * 0.4);border-top:1px solid rgba(240,238,232,0.20);}
+  .hero-cta .btn.ghost{color:#fff;border-color:rgba(240,238,232,0.55);}
+  .hud .br{position:absolute;width:20px;height:20px;border:0 solid rgba(240,238,232,0.55);}
+  .hud .br.tl{top:22px;left:22px;border-top-width:1.5px;border-left-width:1.5px;}
+  .hud .br.tr{top:22px;right:22px;border-top-width:1.5px;border-right-width:1.5px;}
+  .hud .br.bl{bottom:22px;left:22px;border-bottom-width:1.5px;border-left-width:1.5px;}
+  .hud .br.brr{bottom:22px;right:22px;border-bottom-width:1.5px;border-right-width:1.5px;}
+  .hud .br.tl::after{content:"";position:absolute;top:-1.5px;left:-1.5px;width:5px;height:5px;background:var(--accent);}
+  @media(max-width:600px){ .hero .photo img{object-position:62% 28%;} }
+
+  /* plate HUD brackets */
+  .hud-abs{position:absolute;inset:0;pointer-events:none;z-index:1;}
+  .hud-abs .br{position:absolute;width:20px;height:20px;border:0 solid var(--rule-strong);}
+  .hud-abs .br.tl{top:22px;left:22px;border-top-width:1.5px;border-left-width:1.5px;}
+  .hud-abs .br.tr{top:22px;right:22px;border-top-width:1.5px;border-right-width:1.5px;}
+  .hud-abs .br.bl{bottom:22px;left:22px;border-bottom-width:1.5px;border-left-width:1.5px;}
+  .hud-abs .br.brr{bottom:22px;right:22px;border-bottom-width:1.5px;border-right-width:1.5px;}
+  .hud-abs .br.tl::after{content:"";position:absolute;top:-1.5px;left:-1.5px;width:5px;height:5px;background:var(--accent);}
+
+  /* team */
+  .bio{display:flex;gap:.9em;align-items:baseline;}
+  .bio .role{font-family:var(--label);font-size:var(--type-caption);letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:700;}
+
+  /* footer */
+  footer{background:var(--ink-deep);color:#aaa498;padding:48px 0;border-top:none;}
+  footer .wrap{display:flex;justify-content:space-between;align-items:center;gap:1.2em;flex-wrap:wrap;
+    font-family:var(--label);font-size:13px;letter-spacing:.14em;text-transform:uppercase;}
+  footer a{color:#e7e4dc;text-decoration:none;}
+  footer a:hover{color:var(--accent);}
+
+  /* scroll entrance */
+  .rise{opacity:0;transform:translateY(20px);transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1);}
+  .rise.in{opacity:1;transform:none;}
+  @media (prefers-reduced-motion:reduce){ .rise{opacity:1;transform:none;transition:none;} html{scroll-behavior:auto;} }
+</style>
+</head>
+<body>
+
+<header class="mast">
+  <div class="mast-in">
+    <a href="#top" class="wm"><span class="sq"></span> Getin Lab
+      <span class="sig" aria-hidden="true"><i></i><i></i><i></i></span></a>
+    <nav class="links">
+      <a href="#what">Product</a>
+      <a href="#density">Why density</a>
+      <a href="#gps">Without GPS</a>
+      <a href="#fit">Where it fits</a>
+      <a href="#team">Team</a>
+    </nav>
+    <div class="mast-right">
+      <a href="#contact" class="nav-cta">Request a briefing</a>
+      <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false" aria-controls="drawer">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<nav class="drawer" id="drawer" aria-hidden="true">
+  <a href="#what"><span class="n">01</span>Product</a>
+  <a href="#density"><span class="n">02</span>Why density</a>
+  <a href="#gps"><span class="n">03</span>Without GPS</a>
+  <a href="#fit"><span class="n">04</span>Where it fits</a>
+  <a href="#team"><span class="n">05</span>Team</a>
+  <a href="#contact"><span class="n">→</span>Request a briefing</a>
+</nav>
+
+<!-- ============ HERO ============ -->
+<section class="hero" id="top">
+  <div class="photo"><img src="assets/murmuration.webp" alt="A vast murmuration of starlings arcing across the sky as one shifting body" fetchpriority="high"></div>
+  <div class="scrim" aria-hidden="true"></div>
+  <div class="grid-ov" aria-hidden="true"></div>
+  <div class="hud" aria-hidden="true"><span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br brr"></span></div>
+  <div class="hero-in">
+    <div class="hero-top">
+      <span class="ed">Getin Lab — Autonomous site security</span>
+      <span>Yerevan, Armenia</span>
+    </div>
+    <div class="hero-center">
+      <div class="wordmark rise">Getin&nbsp;<span class="lab">Lab</span></div>
+      <p class="product rise"><span class="mur">MUR</span>MUR — the shared intelligence that makes a fleet of robots act as one.</p>
+      <p class="sub-copy rise"><em>Many eyes. One picture — even when the network drops.</em> We turn a fleet of
+        small robots into one team watching your site: holding formation <strong>without GPS</strong> and staying
+        online when connectivity falters. It senses, locates and decides; you stay in control.</p>
+      <div class="hero-cta rise">
+        <a href="#contact" class="btn">Request a briefing</a>
+        <a href="#what" class="btn ghost">See how it works</a>
+      </div>
+    </div>
+    <div class="hero-bottom">
+      <span>Critical infrastructure · Energy · Ports · Data centres</span>
+      <span>The MURMUR platform</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PROBLEM ============ -->
+<section id="problem">
+  <div class="wrap">
+    <div class="kicker rise">The problem</div>
+    <h2 class="headline rise">A perimeter watched by <em>blind spots</em>.</h2>
+    <div class="cols two mt rise" style="margin-top:46px">
+      <div class="col">
+        <span class="tag">The watch today</span>
+        <p>Large and remote sites — energy plants, ports, data centres, logistics yards — are held by
+        fixed cameras and roving patrols. Cameras are <strong>static and blind between points</strong>;
+        patrols can only be in one place at a time. The gaps move with them.</p>
+      </div>
+      <div class="col">
+        <span class="tag">When the network drops</span>
+        <p>Most systems lean on a constant cloud or radio link and on GPS to know where things are.
+        The moment connectivity is <strong>congested, interfered with, or simply out of range</strong>,
+        they stop knowing what they're looking at — exactly when it matters most.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ THE IDEA ============ -->
+<section id="idea" class="plate">
+  <div class="hud-abs" aria-hidden="true"><span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br brr"></span></div>
+  <div class="wrap">
+    <div class="kicker rise">The idea</div>
+    <h2 class="statement rise">A flock no hawk can catch — and <em>no one commands</em>.</h2>
+    <p class="lead drop rise mt" style="max-width:62ch;margin-top:34px">A single starling is easy prey. Ten thousand become a
+      murmuration — one shifting body with no leader to lose. Each bird simply watches its nearest neighbours,
+      and from those simple rules a single intelligent body emerges. MURMUR turns scattered robots into that
+      murmuration on your perimeter: <strong>no centre to fail, no single point to lose.</strong></p>
+  </div>
+</section>
+
+<!-- ============ WHAT WE BUILD ============ -->
+<section id="what">
+  <div class="wrap">
+    <div class="kicker rise">What we build</div>
+    <h2 class="statement rise">We don't sell one robot. We sell the <em>shared intelligence</em> that makes many act as one.</h2>
+    <div class="cols two-l mt" style="margin-top:48px">
+      <div class="col rise">
+        <p class="lead"><strong>MURMUR is Getin Lab's platform.</strong> It watches, locates and decides — and keeps
+        people in control. The platform is <strong>modular and open</strong>: snap in a response system and the same
+        brain can act, always with a <strong>human on the loop</strong>. Perception runs on open vision-language
+        models, fine-tuned on our own data; the part that decides and prioritises is built by us. It plugs into the
+        control systems you already run — <strong>no new screen to learn</strong>.</p>
+        <div class="chips mt-s">
+          <span class="chip"><span class="d"></span>NVIDIA Isaac Sim</span>
+          <span class="chip"><span class="d"></span>Jetson edge compute</span>
+          <span class="chip"><span class="d"></span>Open VLA models</span>
+          <span class="chip"><span class="d"></span>ROS 2</span>
+        </div>
+        <p class="cap" style="margin-top:18px">We build on proven tools — and spend our effort on the part they don't give you.</p>
+      </div>
+      <div class="col rise">
+        <div class="fig-frame">
+          <svg viewBox="0 0 360 300" role="img" aria-label="The MURMUR stack, bottom to top: sensors, perception, localization, coordination, decide, and an action layer that snaps on">
+            <defs><style>
+              .lbl{font-family:'Archivo',sans-serif;font-weight:700;font-size:14px;fill:#e7e4dc;}
+              .tg{font-family:'Archivo',sans-serif;font-weight:600;font-size:9.5px;letter-spacing:.12em;fill:#aaa498;}
+            </style></defs>
+            <g>
+              <rect x="40" y="250" width="280" height="34" fill="none" stroke="#79766c" stroke-width="1.2"/>
+              <text x="54" y="271" class="lbl">Sensors</text><text x="306" y="271" class="tg" text-anchor="end">ADOPT</text>
+              <rect x="40" y="210" width="280" height="34" fill="none" stroke="#79766c" stroke-width="1.2"/>
+              <text x="54" y="231" class="lbl">Perception · VLA</text><text x="306" y="231" class="tg" text-anchor="end">ADOPT + FINE-TUNE</text>
+              <rect x="40" y="170" width="280" height="34" fill="#9d6450" stroke="#9d6450"/>
+              <text x="54" y="191" class="lbl" style="fill:#fff">Localization — without GPS</text><text x="306" y="191" class="tg" style="fill:#f0ddd4" text-anchor="end">OURS</text>
+              <rect x="40" y="130" width="280" height="34" fill="#9d6450" stroke="#9d6450"/>
+              <text x="54" y="151" class="lbl" style="fill:#fff">Coordination</text><text x="306" y="151" class="tg" style="fill:#f0ddd4" text-anchor="end">OURS — THE HARD PART</text>
+              <rect x="40" y="90" width="280" height="34" fill="none" stroke="#9d6450" stroke-width="1.4"/>
+              <text x="54" y="111" class="lbl">Decide &amp; prioritise</text><text x="306" y="111" class="tg" style="fill:#cb9b86" text-anchor="end">OURS</text>
+              <rect x="40" y="46" width="280" height="34" fill="none" stroke="#79766c" stroke-width="1.2" stroke-dasharray="5 4"/>
+              <text x="54" y="67" class="lbl" style="fill:#aaa498">Action — snaps on</text><text x="306" y="67" class="tg" text-anchor="end">OPEN</text>
+            </g>
+          </svg>
+        </div>
+        <p class="cap">Fig. — <b>One brain, many bodies.</b> The middle is ours; the top is open.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ WHY DENSITY WINS ============ -->
+<section id="density" class="plate">
+  <div class="hud-abs" aria-hidden="true"><span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br brr"></span></div>
+  <div class="wrap">
+    <div class="kicker rise">Why density wins</div>
+    <h2 class="headline rise">Many, not few — the robots <em>are</em> the line.</h2>
+    <div class="cols two-l mt" style="margin-top:46px">
+      <div class="col rise">
+        <div class="fig-frame">
+          <svg viewBox="0 0 460 250" role="img" aria-label="A few nodes leave gaps along a line; a dense team leaves no gaps">
+            <defs><style>
+              .h{font-family:'Archivo',sans-serif;font-weight:700;font-size:13px;letter-spacing:.06em;fill:#e7e4dc;}
+              .s{font-family:'Archivo',sans-serif;font-weight:600;font-size:10px;letter-spacing:.04em;}
+            </style></defs>
+            <text x="20" y="28" class="h">A FEW NODES</text>
+            <text x="20" y="44" class="s" fill="#c98a76">gaps = blind spots</text>
+            <line x1="20" y1="70" x2="440" y2="70" stroke="#56544b" stroke-width="1" stroke-dasharray="2 6"/>
+            <g fill="#9d6450"><circle cx="70" cy="70" r="7"/><circle cx="230" cy="70" r="7"/><circle cx="390" cy="70" r="7"/></g>
+            <g fill="none" stroke="#9d6450" stroke-width="1" opacity="0.45"><circle cx="70" cy="70" r="30"/><circle cx="230" cy="70" r="30"/><circle cx="390" cy="70" r="30"/></g>
+            <text x="150" y="105" class="s" fill="#c98a76" text-anchor="middle">▢ gap</text>
+            <text x="310" y="105" class="s" fill="#c98a76" text-anchor="middle">▢ gap</text>
+            <text x="20" y="168" class="h">A DENSE TEAM</text>
+            <text x="20" y="184" class="s" fill="#9d6450">no gaps · no blind spots</text>
+            <line x1="20" y1="210" x2="440" y2="210" stroke="#56544b" stroke-width="1" stroke-dasharray="2 6"/>
+            <g fill="#9d6450">
+              <circle cx="50" cy="210" r="6"/><circle cx="98" cy="210" r="6"/><circle cx="146" cy="210" r="6"/>
+              <circle cx="194" cy="210" r="6"/><circle cx="242" cy="210" r="6"/><circle cx="290" cy="210" r="6"/>
+              <circle cx="338" cy="210" r="6"/><circle cx="386" cy="210" r="6"/><circle cx="430" cy="210" r="6"/>
+            </g>
+            <g fill="none" stroke="#9d6450" stroke-width="1" opacity="0.32">
+              <circle cx="50" cy="210" r="26"/><circle cx="98" cy="210" r="26"/><circle cx="146" cy="210" r="26"/>
+              <circle cx="194" cy="210" r="26"/><circle cx="242" cy="210" r="26"/><circle cx="290" cy="210" r="26"/>
+              <circle cx="338" cy="210" r="26"/><circle cx="386" cy="210" r="26"/><circle cx="430" cy="210" r="26"/>
+            </g>
+          </svg>
+        </div>
+        <p class="cap">Fig. 1 — <b>Coverage.</b> Dense nodes leave no seams.</p>
+      </div>
+      <div class="col rise">
+        <ul class="ed">
+          <li><span class="n">01</span><span><strong>No gaps.</strong> The robots are the line — nothing slips between them.</span></li>
+          <li><span class="n">02</span><span><strong>No single point of failure.</strong> Lose a few and it keeps working; a couple of expensive machines fail as a unit.</span></li>
+          <li><span class="n">03</span><span><strong>Many eyes.</strong> Seeing the same thing from several angles makes positioning far more accurate — fewer false alarms.</span></li>
+          <li><span class="n">04</span><span><strong>Catch the faint stuff.</strong> What one robot misses, many together confirm.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ONE MIXED FLEET ============ -->
+<section id="fleet">
+  <div class="wrap">
+    <div class="kicker rise">One mixed fleet</div>
+    <h2 class="headline rise" style="max-width:26ch">The right machine for every part of the site — composed as one team.</h2>
+    <div class="cols three mt rise" style="margin-top:46px">
+      <div class="col">
+        <h3>Dogs &amp; rovers</h3>
+        <p>Quadruped robots take stairs and rough ground; wheeled rovers bring endurance and payload.
+        MURMUR composes the best mix for each site and shift.</p>
+      </div>
+      <div class="col">
+        <h3>Always covered</h3>
+        <p>Every point is watched by two or more robots, so detection is confirmed from several angles —
+        far fewer false alarms, far fewer misses.</p>
+      </div>
+      <div class="col">
+        <h3>Never off-duty</h3>
+        <p>Roughly a third stay on watch while the rest charge, then surge to full strength on demand.
+        Detach a group for a second area while the main line holds.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ WITHOUT GPS ============ -->
+<section id="gps" class="plate">
+  <div class="hud-abs" aria-hidden="true"><span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br brr"></span></div>
+  <div class="wrap">
+    <div class="kicker rise">The hard part</div>
+    <h2 class="headline rise">Knowing where you are — <em>without GPS</em>.</h2>
+    <div class="cols two-l mt" style="margin-top:46px">
+      <div class="col rise">
+        <div class="fig-frame">
+          <svg viewBox="0 0 420 250" role="img" aria-label="Three positioning channels fuse into one shape: GPS, map-matching, and robots watching each other, tied to the map by anchors">
+            <defs><style>
+              .t{font-family:'Archivo',sans-serif;font-weight:700;font-size:11px;letter-spacing:.04em;fill:#e7e4dc;}
+              .u{font-family:'Archivo',sans-serif;font-weight:500;font-size:9px;letter-spacing:.04em;fill:#aaa498;}
+            </style></defs>
+            <g>
+              <rect x="14" y="24" width="150" height="40" fill="none" stroke="#79766c"/>
+              <text x="26" y="44" class="t">GPS / satellites</text><text x="26" y="58" class="u">assume unreliable</text>
+              <rect x="14" y="92" width="150" height="40" fill="none" stroke="#79766c"/>
+              <text x="26" y="112" class="t">Map-matching</text><text x="26" y="126" class="u">needs landmarks</text>
+              <rect x="14" y="160" width="150" height="40" fill="#9d6450" stroke="#9d6450"/>
+              <text x="26" y="180" class="t" style="fill:#fff">Watch each other</text><text x="26" y="194" class="u" style="fill:#f0ddd4">always on</text>
+            </g>
+            <g stroke="#aaa498" stroke-width="1.3" fill="none">
+              <path d="M164 44 C 210 44, 214 110, 256 118"/>
+              <path d="M164 112 L 256 122"/>
+              <path d="M164 180 C 210 180, 214 130, 256 126"/>
+            </g>
+            <circle cx="300" cy="122" r="40" fill="none" stroke="#9d6450" stroke-width="1.6"/>
+            <text x="300" y="118" class="t" text-anchor="middle" style="font-size:13px">FUSE</text>
+            <text x="300" y="134" class="u" text-anchor="middle">knows its shape</text>
+            <line x1="340" y1="122" x2="392" y2="122" stroke="#79766c" stroke-width="1.3" stroke-dasharray="4 4"/>
+            <text x="366" y="112" class="u" text-anchor="middle">anchors</text>
+            <text x="366" y="146" class="u" text-anchor="middle">&#8594; map</text>
+          </svg>
+        </div>
+        <p class="cap">Fig. 2 — <b>Three channels, one shape.</b></p>
+      </div>
+      <div class="col rise">
+        <ul class="ed">
+          <li><span class="n">01</span><span><strong>Three ways to know where it is, blended</strong> — satellite positioning (assume unreliable), terrain map-matching, and robots watching each other.</span></li>
+          <li><span class="n">02</span><span><strong>Watching each other always works</strong> — even with GPS gone and no landmarks, robots that can see their neighbours fix their own geometry.</span></li>
+          <li><span class="n">03</span><span><strong>A few anchors</strong> tie the whole shape to the real map.</span></li>
+          <li><span class="n">04</span><span><strong>This is our core invention</strong> — built and proven by our in-house engineering bench in Yerevan.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ GRACEFUL DEGRADATION / ANIMATION ============ -->
+<section id="degrade" class="plate">
+  <div class="hud-abs" aria-hidden="true"><span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br brr"></span></div>
+  <div class="wrap">
+    <div class="kicker rise">Stays online as the network fails</div>
+    <h2 class="statement rise">Same picture, <em>less certainty</em> — never blind.</h2>
+    <p class="lead rise mt-s" style="max-width:60ch">Like a good team: take direction from the control room,
+      then hold the picture between yourselves, then go eyes-on and keep to the plan. As each link drops,
+      MURMUR keeps producing an answer — it just carries honest uncertainty with it.</p>
+    <div class="fig rise mt" style="margin-top:40px">
+      <svg id="murmur-anim" viewBox="0 0 760 500" role="img" aria-label="MURMUR's three operating modes: connected, network-degraded, and local-only"></svg>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TRUST ============ -->
+<section id="trust">
+  <div class="wrap">
+    <div class="kicker rise">Intelligence you can trust</div>
+    <h2 class="statement rise">Our AI doesn't just flag something — it <em>shows its work</em>.</h2>
+    <p class="lead rise mt" style="max-width:60ch;margin-top:34px">What it saw, how sure it is, and why it
+      ranked one thing ahead of another. We use vision-language models and wrap them so a person can follow
+      the reasoning and stay in control — <strong>transparent and explainable</strong>, not a black box.</p>
+  </div>
+</section>
+
+<!-- ============ WHERE IT FITS ============ -->
+<section id="fit" class="plate">
+  <div class="hud-abs" aria-hidden="true"><span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br brr"></span></div>
+  <div class="wrap">
+    <div class="kicker rise">Where it fits</div>
+    <h2 class="headline rise">Built for sites where a gap is not an option.</h2>
+    <div class="cols three mt rise" style="margin-top:46px">
+      <div class="col">
+        <span class="tag">01 — Energy &amp; utilities</span>
+        <p>Power generation, substations, pipelines and remote installations spread across ground that
+        patrols can't continuously cover.</p>
+      </div>
+      <div class="col">
+        <span class="tag">02 — Ports &amp; logistics</span>
+        <p>Terminals, yards and distribution hubs where the fence line is long, busy, and changing by the hour.</p>
+      </div>
+      <div class="col">
+        <span class="tag">03 — Data centres &amp; campuses</span>
+        <p>High-value private sites that need continuous, confirmed coverage and stay running when connectivity is degraded.</p>
+      </div>
+    </div>
+    <p class="lead rise mt" style="margin-top:38px;max-width:62ch">We start where the cycle is fast and the
+      value is clear — commercial critical-infrastructure perimeters — and grow through partners into larger
+      programmes across energy, ports and infrastructure worldwide.</p>
+  </div>
+</section>
+
+<!-- ============ WHERE WE ARE ============ -->
+<section id="proof">
+  <div class="wrap">
+    <div class="kicker rise">Where we are — two years in</div>
+    <div class="figrow rise mt" style="margin-top:30px">
+      <div class="fg"><div class="num">2<span class="u"> yrs</span></div><div class="lbl">building fully integrated mechanical, electrical and software prototypes</div></div>
+      <div class="fg"><div class="num">11</div><div class="lbl">R&amp;D engineers — robotics and AI under one roof in Yerevan</div></div>
+      <div class="fg"><div class="num">100<span class="u"> ms</span></div><div class="lbl">see-to-react loop in our tracking engine, on edge hardware</div></div>
+      <div class="fg"><div class="num">500<span class="u"> m+</span></div><div class="lbl">precision tracking range, running at the edge</div></div>
+    </div>
+    <div class="cols three mt rise" style="margin-top:48px">
+      <div class="col">
+        <span class="tag">01 — Tracking engine</span>
+        <p>A closed-loop visual tracking engine, built and deployed: locks on and verifies a target to
+        sub-centimetre precision at range, on compact edge hardware.</p>
+      </div>
+      <div class="col">
+        <span class="tag">02 — First-party nodes</span>
+        <p>Robotic node types designed and built in-house — proof the same brain composes real, heterogeneous
+        hardware into one coordinated team.</p>
+      </div>
+      <div class="col">
+        <span class="tag">03 — Live toolchain</span>
+        <p>A zero-copy edge pipeline (&gt;30 FPS), Isaac Sim digital-twin validation, and a hardware-agnostic
+        ROS 2 API that plugs into third-party cameras, robots and control systems.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TEAM ============ -->
+<section id="team">
+  <div class="wrap">
+    <div class="kicker rise">Team</div>
+    <h2 class="headline rise" style="max-width:24ch">Robotics and AI under one roof.</h2>
+    <div class="cols two mt rise" style="margin-top:44px">
+      <div class="col">
+        <div class="bio"><span class="role">CEO</span></div>
+        <h3 style="margin-top:.3em">Gor Vardanyan</h3>
+        <p>Founder &amp; CEO. Previously built visual navigation for robots operating in GPS-denied
+        conditions — the problem at the heart of MURMUR.</p>
+        <div class="bio mt-s" style="margin-top:24px"><span class="role">Co-founder &amp; CTO</span></div>
+        <h3 style="margin-top:.3em">Armen Khachikyan</h3>
+        <p>Co-founder &amp; CTO, with roughly two decades of domain-specific engineering experience.</p>
+      </div>
+      <div class="col">
+        <p class="lead">An <strong>in-house AI research team</strong> means robotics and models move together —
+        no coordination tax, no hiring lag on the scarcest skill. We are <strong>anchored in Armenia's deep
+        AI-research community</strong> in Yerevan, with world-class applied-ML talent close at hand. The in-house
+        bench owns integration, productisation and deployment.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CONTACT / CLOSE ============ -->
+<section id="contact" class="plate">
+  <div class="hud-abs" aria-hidden="true"><span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br brr"></span></div>
+  <div class="wrap">
+    <p class="pull rise"><span class="mark">&ldquo;</span>No centre to fail. No blind spots. <em>One picture that holds.</em><span class="mark">&rdquo;</span>
+      <span class="by">— Getin Lab · the MURMUR platform</span></p>
+    <div class="hero-cta rise mt" style="margin-top:38px">
+      <a href="mailto:gor@getin.am?subject=MURMUR%20briefing" class="btn">Request a briefing</a>
+      <a href="mailto:gor@getin.am" class="btn ghost">gor@getin.am</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span class="wm" style="color:#e7e4dc"><span class="sq"></span> Getin Lab</span>
+    <span>MURMUR — the autonomous site-security platform</span>
+    <span>© 2026 Getin Lab · gor@getin.am</span>
+  </div>
+</footer>
+
+<script>
+/* ---- mobile drawer ---- */
+(function(){
+  var b=document.getElementById('burger'), d=document.getElementById('drawer');
+  if(!b||!d) return;
+  function close(){ d.classList.remove('open'); b.setAttribute('aria-expanded','false'); d.setAttribute('aria-hidden','true'); document.body.style.overflow=''; }
+  b.addEventListener('click',function(){
+    var open=d.classList.toggle('open');
+    b.setAttribute('aria-expanded',open?'true':'false');
+    d.setAttribute('aria-hidden',open?'false':'true');
+    document.body.style.overflow=open?'hidden':'';
+  });
+  d.querySelectorAll('a').forEach(function(a){ a.addEventListener('click',close); });
+  window.addEventListener('keydown',function(e){ if(e.key==='Escape') close(); });
+})();
+
+/* ---- scroll entrance ---- */
+(function(){
+  var io=new IntersectionObserver(function(es){
+    es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} });
+  },{threshold:0.12});
+  document.querySelectorAll('.rise').forEach(function(el){io.observe(el);});
+})();
+
+/* ---- MURMUR three-modes animation ---- */
+(function(){
+ var S=document.getElementById('murmur-anim'); if(!S) return;
+ var CLAY='#9d6450', CLAY2='#b8806a', SOFT='#7c4d3b', MUT='#aaa498', INK='#e7e4dc', LINE='#3a352f', FAINT='#79766c';
+ var phases=[
+  {n:1,name:'Connected',color:CLAY,sub:'Positioning and the control-room link are up.',
+   note:'Spread wide and cover the whole site, directed from the control room.',
+   squad:'Fleet: patrolling on the security plan.',
+   off:[[-150,-16],[-105,42],[-58,-26],[-10,48],[40,-18],[92,44],[140,-14],[156,36]],gps:true,c2link:true,mesh:false,sight:false},
+  {n:2,name:'Network-degraded',color:CLAY2,sub:'Positioning and the uplink drop out.',
+   note:'Close ranks so every robot sees two or more neighbours; the fleet holds one shared picture on its own mesh.',
+   squad:'Fleet: uplink down — hold formation, share what each one sees.',
+   off:[[-92,-10],[-58,-30],[-22,-6],[14,-30],[52,-8],[92,-28],[-26,30],[44,30]],gps:false,c2link:false,mesh:true,sight:false},
+  {n:3,name:'Local-only',color:SOFT,sub:'Even the local radio is congested.',
+   note:'Pull in tight to keep line-of-sight; signal by movement and light; the fleet keeps covering the line, deciding locally.',
+   squad:'Fleet: radios quiet — visual cues, eyes on each other, keep to the plan.',
+   off:[[-54,-12],[-20,-24],[16,-12],[46,-22],[-34,18],[2,8],[36,18],[60,-2]],gps:false,c2link:false,mesh:false,sight:true}
+ ];
+ function links2(pos){var out=[],seen={};pos.forEach(function(p,i){var ord=pos.map(function(q,j){return [j,(q[0]-p[0])*(q[0]-p[0])+(q[1]-p[1])*(q[1]-p[1])];}).filter(function(a){return a[0]!==i;}).sort(function(a,b){return a[1]-b[1];});ord.slice(0,2).forEach(function(a){var j=a[0];var k=i<j?i+'_'+j:j+'_'+i;if(!seen[k]){seen[k]=1;out.push([p,pos[j]]);}});});return out;}
+ function render(cur,ph){var s='';
+  s+='<rect x="2" y="2" width="756" height="496" rx="6" fill="#1b1a16" stroke="'+LINE+'"/>';
+  s+='<line x1="36" y1="96" x2="724" y2="96" stroke="'+MUT+'" stroke-width="1" stroke-dasharray="2 6" opacity="0.5"/><text x="724" y="90" fill="'+MUT+'" font-family="Archivo,sans-serif" font-size="12" letter-spacing="0.1em" text-anchor="end">SITE PERIMETER</text>';
+  s+='<g transform="translate(380,52)"><rect x="-8" y="-7" width="16" height="14" rx="2" fill="none" stroke="'+(ph.gps?CLAY:FAINT)+'" stroke-width="1.5"/><line x1="-15" y1="0" x2="-8" y2="0" stroke="'+(ph.gps?CLAY:FAINT)+'" stroke-width="1.5"/><line x1="8" y1="0" x2="15" y2="0" stroke="'+(ph.gps?CLAY:FAINT)+'" stroke-width="1.5"/>'+(ph.gps?'':'<line x1="-13" y1="-13" x2="13" y2="13" stroke="'+SOFT+'" stroke-width="2"/>')+'</g>';
+  s+='<text x="380" y="82" fill="'+(ph.gps?MUT:SOFT)+'" font-family="Archivo,sans-serif" font-size="12" letter-spacing="0.08em" text-anchor="middle">'+(ph.gps?'POSITIONING':'GPS LOST')+'</text>';
+  s+='<g transform="translate(60,300)"><rect x="-17" y="-2" width="34" height="20" rx="2" fill="none" stroke="'+MUT+'" stroke-width="1.5"/><line x1="0" y1="-2" x2="0" y2="-17" stroke="'+MUT+'" stroke-width="1.5"/><circle cx="0" cy="-19" r="2.6" fill="'+(ph.c2link?CLAY:FAINT)+'"/></g><text x="60" y="334" fill="'+MUT+'" font-family="Archivo,sans-serif" font-size="12" letter-spacing="0.08em" text-anchor="middle">CONTROL ROOM</text>';
+  cur.forEach(function(p){s+='<circle cx="'+p[0]+'" cy="'+p[1]+'" r="16" fill="'+CLAY+'" opacity="0.08"/>';});
+  if(ph.c2link){cur.forEach(function(p){s+='<line x1="60" y1="298" x2="'+p[0]+'" y2="'+p[1]+'" stroke="'+CLAY+'" stroke-width="1" opacity="0.30"/>';});}
+  else{s+='<text x="92" y="288" fill="'+SOFT+'" font-family="Archivo,sans-serif" font-size="12" letter-spacing="0.04em">UPLINK LOST</text><line x1="74" y1="296" x2="86" y2="282" stroke="'+SOFT+'" stroke-width="2"/><line x1="86" y1="296" x2="74" y2="282" stroke="'+SOFT+'" stroke-width="2"/>';}
+  if(ph.mesh){links2(cur).forEach(function(l){s+='<line x1="'+l[0][0]+'" y1="'+l[0][1]+'" x2="'+l[1][0]+'" y2="'+l[1][1]+'" stroke="'+CLAY+'" stroke-width="1.6" opacity="0.55"/>';});}
+  if(ph.sight){links2(cur).forEach(function(l){s+='<line x1="'+l[0][0]+'" y1="'+l[0][1]+'" x2="'+l[1][0]+'" y2="'+l[1][1]+'" stroke="'+CLAY+'" stroke-width="1.4" stroke-dasharray="4 5" opacity="0.65"/>';});}
+  cur.forEach(function(p){s+='<circle cx="'+p[0]+'" cy="'+p[1]+'" r="10" fill="none" stroke="'+ph.color+'" stroke-width="1.5" opacity="0.55"/><circle cx="'+p[0]+'" cy="'+p[1]+'" r="6" fill="'+CLAY+'"/>';});
+  [1,2,3].forEach(function(d,i){s+='<circle cx="'+(30+i*16)+'" cy="372" r="4" fill="'+(ph.n===d?ph.color:LINE)+'"/>';});
+  s+='<text x="92" y="378" fill="'+ph.color+'" font-family="Archivo,sans-serif" font-size="17" font-weight="700">'+ph.n+'. '+ph.name+'</text>';
+  s+='<text x="24" y="414" fill="'+INK+'" font-family="Newsreader,serif" font-size="15">'+ph.sub+'</text>';
+  s+='<text x="24" y="440" fill="'+MUT+'" font-family="Newsreader,serif" font-size="13.5">'+ph.note+'</text>';
+  s+='<text x="24" y="470" fill="'+MUT+'" font-family="Newsreader,serif" font-size="13.5" font-style="italic">'+ph.squad+'</text>';
+  return s;}
+ var pi=0,from=phases[0].off.map(function(p){return p.slice();}),target=phases[0].off,cur=from.map(function(p){return p.slice();}),start=performance.now();
+ var TW=1500,HOLD=3600,CY=170,CX0=380,AMP=140,PER=9000;
+ function ease(x){return x<0.5?2*x*x:1-Math.pow(-2*x+2,2)/2;}
+ function frame(now){var e=now-start;
+  if(e<TW){var a=ease(e/TW);cur=from.map(function(p,i){return [p[0]+(target[i][0]-p[0])*a,p[1]+(target[i][1]-p[1])*a];});}
+  else{cur=target.map(function(p){return p.slice();});if(e>TW+HOLD){pi=(pi+1)%3;from=cur.map(function(p){return p.slice();});target=phases[pi].off;start=now;}}
+  var cx=CX0+AMP*Math.sin(now/PER*2*Math.PI);
+  var P=cur.map(function(o){return [cx+o[0],CY+o[1]];});
+  S.innerHTML=render(P,phases[pi]);requestAnimationFrame(frame);}
+ requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
